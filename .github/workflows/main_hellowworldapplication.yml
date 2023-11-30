@@ -1,4 +1,4 @@
-name: Build and deploy Python app to Azure Web App - helloworldapplication
+name: Build and deploy ASP.Net Core app to Azure Web App - hellowworldapplication
 
 on:
   push:
@@ -14,16 +14,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v2
         with:
-          python-version: '3.x'
+          dotnet-version: '3.1'
+
+      - name: Build with dotnet
+        run: dotnet build ../hello.py --configuration Release
+        working-directory: ${{ github.workspace }}
+
+      - name: dotnet publish
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        working-directory: ${{ github.workspace }}
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
         with:
-          name: python-app
-          path: .
+          name: .net-app
+          path: ${{env.DOTNET_ROOT}}/myapp
 
   deploy:
     runs-on: windows-latest
@@ -36,7 +44,7 @@ jobs:
       - name: Download artifact from build job
         uses: actions/download-artifact@v2
         with:
-          name: python-app
+          name: .net-app
       
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -44,5 +52,5 @@ jobs:
         with:
           app-name: 'Lab5'
           slot-name: 'Production'
-          package: .
+          package: ${{ github.workspace }}\.net-app
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_7C1F6648921444C8BE7186EA72350BFE }}
