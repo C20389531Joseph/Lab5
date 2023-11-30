@@ -20,7 +20,7 @@ jobs:
           dotnet-version: '3.1'
 
       - name: Build with dotnet
-        run: dotnet build ../../../hello.py --configuration Release
+        run: dotnet build '../../../hello.py' --configuration Release
         working-directory: ${{ github.workspace }}
 
       - name: dotnet publish
