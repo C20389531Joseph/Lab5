@@ -14,13 +14,13 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v2  # Updated to v2
 
       - name: Set up .NET Core
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v2  # Updated to v2
         with:
-          dotnet-version: '8.x'
-          include-prerelease: true
+          dotnet-version: '3.1'  # Adjusted version to a stable release
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
@@ -29,7 +29,7 @@ jobs:
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2  # Updated to v2
         with:
           name: .net-app
           path: ${{env.DOTNET_ROOT}}/myapp
@@ -43,7 +43,7 @@ jobs:
     
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v2  # Updated to v2
         with:
           name: .net-app
       
@@ -53,5 +53,5 @@ jobs:
         with:
           app-name: 'hellowworldapplication'
           slot-name: 'Production'
-          package: .
+          package: ${{ github.workspace }}\.net-app  # Adjusted the path to the published app
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_7C1F6648921444C8BE7186EA72350BFE }}
